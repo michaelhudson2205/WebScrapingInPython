@@ -5,6 +5,9 @@ from playwright.async_api import async_playwright
 from bs4 import BeautifulSoup
 from datetime import datetime
 
+# ! Set this variable to the desired year
+ais_year = 2024
+
 
 # Function to scrape a single ACNC page
 async def scrape_acnc_data(url):
@@ -86,7 +89,7 @@ async def scrape_all_acnc(urls):
     results = []
     for rec in records:
         phn_name = rec["PHN_Name"]
-        url = rec["URL"]
+        url = rec["AIS_Link"]
         print(f"Scraping {phn_name} - {url}...")
         try:
             data = await scrape_acnc_data(url)
@@ -107,14 +110,14 @@ async def scrape_all_acnc(urls):
 
 
 # Run the scraper
-input_csv = "phn_urls_all.csv"  # Path to the input CSV file
+input_csv = f"file2_ais{ais_year}_links.csv"  # Path to the input CSV file
 
 timestamp = datetime.now().strftime("%Y-%m-%d_%H%M%S")
-output_csv = f"acnc_scraped_data_{timestamp}.csv"  # Path to the output CSV file
+output_csv = f"file3_ais{ais_year}_data_{timestamp}.csv"  # Path to the output CSV file
 
 df_urls = pd.read_csv(input_csv)
 # urls = df_urls["URL"].dropna().tolist()  # Assuming the URLs are in a column named 'URL'
-records = df_urls[["PHN_Name", "URL"]].dropna().to_dict(orient="records")
+records = df_urls[["PHN_Name", "AIS_Link"]].dropna().to_dict(orient="records")
 
 # print(f"Found {len(urls)} URLs to scrape...\n")
 results = asyncio.run(scrape_all_acnc(records))
